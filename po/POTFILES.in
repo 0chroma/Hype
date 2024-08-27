@@ -1,0 +1,6 @@
+data/rip.chroma.Hype.desktop.in.in
+data/rip.chroma.Hype.gschema.xml.in
+data/rip.chroma.Hype.metainfo.xml.in.in
+data/resources/ui/shortcuts.ui
+data/resources/ui/window.ui
+src/application.rs
