@@ -20,6 +20,8 @@ relm4::new_stateless_action!(QuitAction, AppActionGroup, "quit");
 fn main() {
     gtk::init().unwrap();
 
+    relm4_icons::initialize_icons();
+
     // Enable logging
     tracing_subscriber::fmt()
         .with_span_events(tracing_subscriber::fmt::format::FmtSpan::FULL)
@@ -57,10 +59,7 @@ fn main() {
     let app = RelmApp::from_app(app);
 
     let data = res
-        .lookup_data(
-            "/rip/chroma/Hype/style.css",
-            gio::ResourceLookupFlags::NONE,
-        )
+        .lookup_data("/rip/chroma/Hype/style.css", gio::ResourceLookupFlags::NONE)
         .unwrap();
     app.set_global_css(&glib::GString::from_utf8_checked(data.to_vec()).unwrap());
     app.visible_on_activate(false).run::<App>(());

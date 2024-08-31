@@ -1,11 +1,15 @@
 use relm4::{
     actions::{RelmAction, RelmActionGroup},
-    adw, gtk, main_application, Component, ComponentController, ComponentParts, ComponentSender,
-    Controller, SimpleComponent,
+    adw,
+    gtk::{self},
+    main_application, Component, ComponentController, ComponentParts, ComponentSender, Controller,
+    SimpleComponent,
 };
+use relm4_icons::icon_names;
 
 use gtk::prelude::{
-    ApplicationExt, ApplicationWindowExt, GtkWindowExt, OrientableExt, SettingsExt, WidgetExt,
+    ApplicationExt, ApplicationWindowExt, BoxExt, GtkWindowExt, OrientableExt, SettingsExt,
+    TextViewExt, WidgetExt,
 };
 use gtk::{gio, glib};
 
@@ -60,7 +64,7 @@ impl SimpleComponent for App {
                 .unwrap() -> gtk::ShortcutsWindow {
                     set_transient_for: Some(&main_window),
                     set_application: Some(&main_application()),
-            },
+                },
 
             add_css_class?: if PROFILE == "Devel" {
                     Some("devel")
@@ -75,16 +79,53 @@ impl SimpleComponent for App {
                     pack_end = &gtk::MenuButton {
                         set_icon_name: "open-menu-symbolic",
                         set_menu_model: Some(&primary_menu),
+                    },
+                },
+                gtk::SearchBar {
+                    set_search_mode: true,
+                    #[wrap(Some)]
+                    set_child = &adw::Clamp {
+                        set_hexpand: true,
+                        gtk::SearchEntry {
+                        }
                     }
                 },
 
-                gtk::Label {
-                    set_label: "Hello world!",
-                    add_css_class: "title-header",
-                    set_vexpand: true,
+                // TODO: make stack with empty page, message factory page, etc
+                // https://relm4.org/book/stable/efficient_ui/factory.html
+                adw::Clamp {
+                    gtk::Label {
+                        set_label: "Chat will go here",
+                        add_css_class: "title-header",
+                        set_vexpand: true,
+                    },
+                },
+
+                adw::Clamp {
+                    gtk::Box {
+                        set_orientation: gtk::Orientation::Horizontal,
+                        set_spacing: 10,
+                        set_margin_bottom: 8,
+
+                        gtk::TextView {
+                            add_css_class: "card",
+                            set_hexpand: true,
+                            set_left_margin: 7,
+                            set_right_margin: 7,
+                            set_top_margin: 7,
+                            set_bottom_margin: 7,
+                        },
+                        gtk::Button {
+                            add_css_class: "circular",
+                            add_css_class: "suggested-action",
+                            add_css_class: "image-button",
+                            gtk::Image {
+                                set_icon_name: Some(icon_names::PAPER_PLANE),
+                            },
+                        }
+                    }
                 }
             }
-
         }
     }
 

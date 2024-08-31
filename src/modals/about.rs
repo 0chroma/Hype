@@ -16,13 +16,13 @@ impl SimpleComponent for AboutDialog {
         adw::AboutWindow::builder()
             .application_icon(APP_ID)
             // Insert your license of choice here
-            // .license_type(gtk::License::MitX11)
+            .license_type(gtk::License::Gpl30)
             // Insert your website here
             // .website("https://gitlab.gnome.org/bilelmoussaoui/hype/")
             // Insert your Issues page
             // .issue_url("https://gitlab.gnome.org/World/Rust/hype/-/issues")
             // Insert your application name here
-            .application_name("Relm4-template")
+            .application_name("Hype")
             .version(VERSION)
             .translator_credits("translator-credits")
             .copyright("© 2023 0chroma")
