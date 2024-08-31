@@ -18,9 +18,9 @@ impl SimpleComponent for AboutDialog {
             // Insert your license of choice here
             .license_type(gtk::License::Gpl30)
             // Insert your website here
-            // .website("https://gitlab.gnome.org/bilelmoussaoui/hype/")
+            .website("https://github.com/0chroma/Hype")
             // Insert your Issues page
-            // .issue_url("https://gitlab.gnome.org/World/Rust/hype/-/issues")
+            .issue_url("https://github.com/0chroma/Hype/issues")
             // Insert your application name here
             .application_name("Hype")
             .version(VERSION)
