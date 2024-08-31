@@ -2,7 +2,7 @@
 <!-- 0chroma 2024 <me@chroma.rip> -->
 <component type="desktop-application">
   <id>@app-id@</id>
-  <metadata_license>GPL-3.0-or-later</metadata_license>
+  <metadata_license>CC0-1.0</metadata_license>
   <!-- Insert your license of choice here -->
   <!-- <project_license>MIT</project_license> -->
   <name>Hype</name>
