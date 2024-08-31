@@ -1,12 +1,12 @@
 [Desktop Entry]
 Name=Hype
-Comment=Write a GTK + Rust application
+Comment=Chat app for streaming platforms
 Type=Application
 Exec=hype
 Terminal=false
-Categories=GNOME;GTK;
+Categories=GNOME;GTK;Network;Chat;InstantMessaging
 # Translators: Search terms to find this application. Do NOT translate or localize the semicolons! The list MUST also end with a semicolon!
-Keywords=Gnome;GTK;
+Keywords=stream;chat;twitch;youtube;
 # Translators: Do NOT translate or transliterate this text (this is an icon file name)!
 Icon=@icon@
 StartupNotify=true
