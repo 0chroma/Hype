@@ -25,7 +25,7 @@ impl SimpleComponent for AboutDialog {
             .application_name("Hype")
             .version(VERSION)
             .translator_credits("translator-credits")
-            .copyright("© 2023 0chroma")
+            .copyright("© 2024 0chroma")
             .developers(vec!["0chroma"])
             .designers(vec!["0chroma"])
             .hide_on_close(true)

@@ -8,20 +8,23 @@ use relm4::{
 use relm4_icons::icon_names;
 
 use gtk::prelude::{
-    ApplicationExt, ApplicationWindowExt, BoxExt, GtkWindowExt, OrientableExt, SettingsExt,
-    TextViewExt, WidgetExt,
+    ApplicationExt, ApplicationWindowExt, BoxExt, ButtonExt, GtkWindowExt, OrientableExt,
+    SettingsExt, TextViewExt, WidgetExt,
 };
 use gtk::{gio, glib};
 
+use crate::chat_feed::{ChatFeed, ChatFeedMsg};
 use crate::config::{APP_ID, PROFILE};
 use crate::modals::about::AboutDialog;
 
 pub(super) struct App {
     about_dialog: Controller<AboutDialog>,
+    chat_feed: Controller<ChatFeed>,
 }
 
 #[derive(Debug)]
 pub(super) enum AppMsg {
+    Send,
     Quit,
 }
 
@@ -91,15 +94,7 @@ impl SimpleComponent for App {
                     }
                 },
 
-                // TODO: make stack with empty page, message factory page, etc
-                // https://relm4.org/book/stable/efficient_ui/factory.html
-                adw::Clamp {
-                    gtk::Label {
-                        set_label: "Chat will go here",
-                        add_css_class: "title-header",
-                        set_vexpand: true,
-                    },
-                },
+                model.chat_feed.widget(),
 
                 adw::Clamp {
                     gtk::Box {
@@ -119,6 +114,7 @@ impl SimpleComponent for App {
                             add_css_class: "circular",
                             add_css_class: "suggested-action",
                             add_css_class: "image-button",
+                            connect_clicked => AppMsg::Send,
                             gtk::Image {
                                 set_icon_name: Some(icon_names::PAPER_PLANE),
                             },
@@ -139,7 +135,12 @@ impl SimpleComponent for App {
             .launch(())
             .detach();
 
-        let model = Self { about_dialog };
+        let chat_feed: Controller<ChatFeed> = ChatFeed::builder().launch(()).detach();
+
+        let model = Self {
+            about_dialog,
+            chat_feed,
+        };
 
         let widgets = view_output!();
 
@@ -170,6 +171,7 @@ impl SimpleComponent for App {
 
     fn update(&mut self, message: Self::Input, _sender: ComponentSender<Self>) {
         match message {
+            AppMsg::Send => self.chat_feed.emit(ChatFeedMsg::AddMsg),
             AppMsg::Quit => main_application().quit(),
         }
     }
