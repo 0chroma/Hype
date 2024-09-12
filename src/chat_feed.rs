@@ -46,6 +46,8 @@ impl SimpleComponent for ChatFeed {
                 set_valign: gtk::Align::End,
                 set_margin_end: 24,
                 set_margin_bottom: 24,
+                #[watch]
+                set_reveal_child: !model.is_at_bottom,
 
                 gtk::Button {
                     add_css_class: "osd",
@@ -64,7 +66,7 @@ impl SimpleComponent for ChatFeed {
             gtk::ScrolledWindow {
                 set_vexpand: true,
                 #[wrap(Some)]
-                set_vadjustment = &gtk::Adjustment {
+                set_vadjustment: adjustment = &gtk::Adjustment {
                     connect_value_changed[sender] => move |adj| {
                         let is_at_bottom = adj.value() == (adj.upper() - adj.page_size());
                         sender.input(ChatFeedMsg::HandleScroll(is_at_bottom))
@@ -80,17 +82,6 @@ impl SimpleComponent for ChatFeed {
             }
         }
 
-    }
-
-    fn post_view() {
-        let adj = scrolled_window.vadjustment();
-        if adj.value() == (adj.upper() - adj.page_size()) {
-            //at bottom
-            scroll_bottom_revealer.set_reveal_child(false);
-        } else {
-            //not at bottom
-            scroll_bottom_revealer.set_reveal_child(true);
-        }
     }
 
     fn init(
@@ -124,8 +115,6 @@ impl SimpleComponent for ChatFeed {
                 });
             }
             ChatFeedMsg::ScrollBottom(force) => {
-                // TODO: only do this when already scrolled to bottom
-                // maybe by setting a "sticky mode" like in fractal
                 if self.is_at_bottom || force {
                     let n_items = self.message_list.len();
                     self.message_list.view.scroll_to(
@@ -137,7 +126,6 @@ impl SimpleComponent for ChatFeed {
             }
             ChatFeedMsg::HandleScroll(is_at_bottom) => {
                 self.is_at_bottom = is_at_bottom;
-                // scroll to bottom button is handled in post_view
             }
         }
     }
