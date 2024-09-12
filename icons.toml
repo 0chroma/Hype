@@ -3,7 +3,7 @@ base_resource_path = "/rip/chroma/Hype/"
 
 # List of icon names you found (shipped with this crate)
 # Note: the file ending `-symbolic.svg` isn't part of the icon name.
-icons = ["paper-plane"]
+icons = ["paper-plane", "down"]
 
 # Optional: Specify a folder containing your own SVG icons
 # icon_folder = "my_svg_icons"

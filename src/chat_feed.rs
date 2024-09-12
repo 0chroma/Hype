@@ -1,4 +1,4 @@
-use gtk::prelude::{AdjustmentExt, GridExt, WidgetExt};
+use gtk::prelude::{AdjustmentExt, ButtonExt, GridExt, WidgetExt};
 
 use relm4::{
     binding::StringBinding,
@@ -7,6 +7,8 @@ use relm4::{
     RelmObjectExt,
 };
 
+use relm4_icons::icon_names;
+
 pub struct ChatFeed {
     message_list: TypedListView<ChatLine, gtk::NoSelection>,
 }
@@ -14,6 +16,8 @@ pub struct ChatFeed {
 #[derive(Debug)]
 pub enum ChatFeedMsg {
     Append,
+    ScrollBottom,
+    MaybeShowScrollButton,
     //TODO: updates ie msg deleted
 }
 
@@ -30,14 +34,41 @@ impl SimpleComponent for ChatFeed {
 
     view! {
         #[root]
-        #[name="scrolled_window"]
-        gtk::ScrolledWindow {
-            set_vexpand: true,
+        gtk::Overlay {
+            #[name="scroll_bottom_revealer"]
+            add_overlay = &gtk::Revealer {
+                set_transition_type: gtk::RevealerTransitionType::Crossfade,
+                set_halign: gtk::Align::End,
+                set_valign: gtk::Align::End,
+                set_margin_end: 24,
+                set_margin_bottom: 24,
 
-            adw::ClampScrollable {
-                #[local_ref]
-                message_list_view -> gtk::ListView {
-                    add_css_class: "navigation-sidebar"
+                gtk::Button {
+                    add_css_class: "osd",
+                    add_css_class: "circular",
+                    add_css_class: "overlaid",
+                    set_tooltip_text: Some("Scroll to Bottom"),
+                    connect_clicked => ChatFeedMsg::ScrollBottom,
+
+                    gtk::Image {
+                        set_icon_name: Some(icon_names::DOWN),
+                    },
+                },
+            },
+
+            #[name="scrolled_window"]
+            gtk::ScrolledWindow {
+                set_vexpand: true,
+                #[wrap(Some)]
+                set_vadjustment = &gtk::Adjustment {
+                    connect_value_changed => ChatFeedMsg::MaybeShowScrollButton,
+                },
+
+                adw::ClampScrollable {
+                    #[local_ref]
+                    message_list_view -> gtk::ListView {
+                        add_css_class: "navigation-sidebar"
+                    }
                 }
             }
         }
@@ -46,15 +77,19 @@ impl SimpleComponent for ChatFeed {
 
     fn post_view() {
         let adj = scrolled_window.vadjustment();
-        let new_adj = adj.clone();
-        new_adj.set_value(adj.upper() - adj.page_size());
-        scrolled_window.set_vadjustment(Some(&new_adj));
+        if adj.value() == (adj.upper() - adj.page_size()) {
+            //at bottom
+            scroll_bottom_revealer.set_reveal_child(false);
+        } else {
+            //not at bottom
+            scroll_bottom_revealer.set_reveal_child(true);
+        }
     }
 
     fn init(
         _params: Self::Init,
         root: Self::Root,
-        _sender: ComponentSender<Self>,
+        sender: ComponentSender<Self>,
     ) -> ComponentParts<Self> {
         let message_list: TypedListView<ChatLine, gtk::NoSelection> = TypedListView::new();
 
@@ -65,7 +100,7 @@ impl SimpleComponent for ChatFeed {
         ComponentParts { model, widgets }
     }
 
-    fn update(&mut self, msg: Self::Input, _sender: ComponentSender<Self>) {
+    fn update(&mut self, msg: Self::Input, sender: ComponentSender<Self>) {
         match msg {
             ChatFeedMsg::Append => {
                 self.message_list.append(ChatLine::new(
@@ -73,6 +108,16 @@ impl SimpleComponent for ChatFeed {
                     "Some User".to_string(),
                     "Hello, this is a sample message. It is very long to test if text wrapping works correctly. Chat, is this real?".to_string(),
                 ));
+                sender.input(ChatFeedMsg::ScrollBottom);
+            }
+            ChatFeedMsg::ScrollBottom => {
+                let n_items = self.message_list.len();
+                self.message_list
+                    .view
+                    .scroll_to(n_items - 1, gtk::ListScrollFlags::FOCUS, None);
+            }
+            ChatFeedMsg::MaybeShowScrollButton => {
+                // handled in post_view
             }
         }
     }
