@@ -171,7 +171,7 @@ impl SimpleComponent for App {
 
     fn update(&mut self, message: Self::Input, _sender: ComponentSender<Self>) {
         match message {
-            AppMsg::Send => self.chat_feed.emit(ChatFeedMsg::AddMsg),
+            AppMsg::Send => self.chat_feed.emit(ChatFeedMsg::Append),
             AppMsg::Quit => main_application().quit(),
         }
     }
