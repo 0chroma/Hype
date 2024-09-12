@@ -9,15 +9,19 @@ use relm4::{
 
 use relm4_icons::icon_names;
 
+use glib::source::timeout_add_once;
+use std::time::Duration;
+
 pub struct ChatFeed {
     message_list: TypedListView<ChatLine, gtk::NoSelection>,
+    is_at_bottom: bool,
 }
 
 #[derive(Debug)]
 pub enum ChatFeedMsg {
     Append,
-    ScrollBottom,
-    MaybeShowScrollButton,
+    ScrollBottom(bool),
+    HandleScroll(bool),
     //TODO: updates ie msg deleted
 }
 
@@ -48,7 +52,7 @@ impl SimpleComponent for ChatFeed {
                     add_css_class: "circular",
                     add_css_class: "overlaid",
                     set_tooltip_text: Some("Scroll to Bottom"),
-                    connect_clicked => ChatFeedMsg::ScrollBottom,
+                    connect_clicked => ChatFeedMsg::ScrollBottom(true),
 
                     gtk::Image {
                         set_icon_name: Some(icon_names::DOWN),
@@ -61,7 +65,10 @@ impl SimpleComponent for ChatFeed {
                 set_vexpand: true,
                 #[wrap(Some)]
                 set_vadjustment = &gtk::Adjustment {
-                    connect_value_changed => ChatFeedMsg::MaybeShowScrollButton,
+                    connect_value_changed[sender] => move |adj| {
+                        let is_at_bottom = adj.value() == (adj.upper() - adj.page_size());
+                        sender.input(ChatFeedMsg::HandleScroll(is_at_bottom))
+                    },
                 },
 
                 adw::ClampScrollable {
@@ -93,7 +100,10 @@ impl SimpleComponent for ChatFeed {
     ) -> ComponentParts<Self> {
         let message_list: TypedListView<ChatLine, gtk::NoSelection> = TypedListView::new();
 
-        let model = ChatFeed { message_list };
+        let model = ChatFeed {
+            message_list,
+            is_at_bottom: true,
+        };
         let message_list_view = &model.message_list.view;
 
         let widgets = view_output!();
@@ -108,16 +118,26 @@ impl SimpleComponent for ChatFeed {
                     "Some User".to_string(),
                     "Hello, this is a sample message. It is very long to test if text wrapping works correctly. Chat, is this real?".to_string(),
                 ));
-                sender.input(ChatFeedMsg::ScrollBottom);
+                // workaround for race condition in relm
+                timeout_add_once(Duration::from_millis(10), move || {
+                    sender.input(ChatFeedMsg::ScrollBottom(false));
+                });
             }
-            ChatFeedMsg::ScrollBottom => {
-                let n_items = self.message_list.len();
-                self.message_list
-                    .view
-                    .scroll_to(n_items - 1, gtk::ListScrollFlags::FOCUS, None);
+            ChatFeedMsg::ScrollBottom(force) => {
+                // TODO: only do this when already scrolled to bottom
+                // maybe by setting a "sticky mode" like in fractal
+                if self.is_at_bottom || force {
+                    let n_items = self.message_list.len();
+                    self.message_list.view.scroll_to(
+                        n_items - 1,
+                        gtk::ListScrollFlags::FOCUS,
+                        None,
+                    );
+                }
             }
-            ChatFeedMsg::MaybeShowScrollButton => {
-                // handled in post_view
+            ChatFeedMsg::HandleScroll(is_at_bottom) => {
+                self.is_at_bottom = is_at_bottom;
+                // scroll to bottom button is handled in post_view
             }
         }
     }
