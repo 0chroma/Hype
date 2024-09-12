@@ -1,4 +1,4 @@
-use gtk::prelude::{GridExt, WidgetExt};
+use gtk::prelude::{AdjustmentExt, GridExt, WidgetExt};
 
 use relm4::{
     binding::StringBinding,
@@ -30,6 +30,7 @@ impl SimpleComponent for ChatFeed {
 
     view! {
         #[root]
+        #[name="scrolled_window"]
         gtk::ScrolledWindow {
             set_vexpand: true,
 
@@ -40,6 +41,14 @@ impl SimpleComponent for ChatFeed {
                 }
             }
         }
+
+    }
+
+    fn post_view() {
+        let adj = scrolled_window.vadjustment();
+        let new_adj = adj.clone();
+        new_adj.set_value(adj.upper() - adj.page_size());
+        scrolled_window.set_vadjustment(Some(&new_adj));
     }
 
     fn init(
