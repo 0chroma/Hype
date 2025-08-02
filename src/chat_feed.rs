@@ -186,6 +186,7 @@ impl RelmListItem for ChatLine {
                     set_align: gtk::Align::Start,
                 },
 
+                // TODO: change this to a read only TextView
                 #[name = "message"]
                 attach[1, 1, 1, 1] = &gtk::Label {
                     set_wrap: true,
