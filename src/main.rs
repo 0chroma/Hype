@@ -4,7 +4,7 @@ mod app;
 mod chat_feed;
 mod modals;
 
-use config::{APP_ID, GETTEXT_PACKAGE, LOCALEDIR, RESOURCES_FILE};
+use config::{APP_ID, GETTEXT_PACKAGE};
 use gettextrs::{gettext, LocaleCategory};
 use gtk::prelude::ApplicationExt;
 use gtk::{gio, glib};
@@ -12,6 +12,10 @@ use relm4::{
     actions::{AccelsPlus, RelmAction, RelmActionGroup},
     gtk, main_application, RelmApp,
 };
+
+mod icon_names {
+    include!(concat!(env!("OUT_DIR"), "/icon_names.rs"));
+}
 
 use app::App;
 
@@ -21,7 +25,7 @@ relm4::new_stateless_action!(QuitAction, AppActionGroup, "quit");
 fn main() {
     gtk::init().unwrap();
 
-    relm4_icons::initialize_icons();
+    relm4_icons::initialize_icons(icon_names::GRESOURCE_BYTES, icon_names::RESOURCE_PREFIX);
 
     // Enable logging
     tracing_subscriber::fmt()
@@ -31,13 +35,12 @@ fn main() {
 
     // setup gettext
     gettextrs::setlocale(LocaleCategory::LcAll, "");
-    gettextrs::bindtextdomain(GETTEXT_PACKAGE, LOCALEDIR).expect("Unable to bind the text domain");
+    // gettextrs::bindtextdomain(GETTEXT_PACKAGE, LOCALEDIR).expect("Unable to bind the text domain");
     gettextrs::textdomain(GETTEXT_PACKAGE).expect("Unable to switch to the text domain");
 
     glib::set_application_name(&gettext("Hype"));
 
-    let res = gio::Resource::load(RESOURCES_FILE).expect("Could not load gresource file");
-    gio::resources_register(&res);
+    gio::resources_register_include!("hype.gresource").expect("Failed to register resources.");
 
     gtk::Window::set_default_icon_name(APP_ID);
 
@@ -59,9 +62,9 @@ fn main() {
 
     let app = RelmApp::from_app(app);
 
-    let data = res
-        .lookup_data("/rip/chroma/Hype/style.css", gio::ResourceLookupFlags::NONE)
-        .unwrap();
+    let data =
+        gio::resources_lookup_data("/rip/chroma/Hype/style.css", gio::ResourceLookupFlags::NONE)
+            .unwrap();
     relm4::set_global_css(&glib::GString::from_utf8_checked(data.to_vec()).unwrap());
     app.visible_on_activate(false).run::<App>(());
 }

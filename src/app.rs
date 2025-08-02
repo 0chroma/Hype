@@ -1,3 +1,12 @@
+use crate::chat_feed::{ChatFeed, ChatFeedMsg};
+use crate::config::{APP_ID, PROFILE};
+use crate::icon_names;
+use crate::modals::about::AboutDialog;
+use gtk::prelude::{
+    ApplicationExt, ApplicationWindowExt, BoxExt, ButtonExt, GtkWindowExt, OrientableExt,
+    SettingsExt, TextViewExt, WidgetExt,
+};
+use gtk::{gio, glib};
 use relm4::{
     actions::{RelmAction, RelmActionGroup},
     adw,
@@ -5,17 +14,6 @@ use relm4::{
     main_application, Component, ComponentController, ComponentParts, ComponentSender, Controller,
     SimpleComponent,
 };
-use relm4_icons::icon_names;
-
-use gtk::prelude::{
-    ApplicationExt, ApplicationWindowExt, BoxExt, ButtonExt, GtkWindowExt, OrientableExt,
-    SettingsExt, TextViewExt, WidgetExt,
-};
-use gtk::{gio, glib};
-
-use crate::chat_feed::{ChatFeed, ChatFeedMsg};
-use crate::config::{APP_ID, PROFILE};
-use crate::modals::about::AboutDialog;
 
 pub(super) struct App {
     about_dialog: Controller<AboutDialog>,

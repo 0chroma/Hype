@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <schemalist>
-  <schema path="/rip/chroma/Hype/" id="@app-id@" gettext-domain="@gettext-package@">
+  <schema path="/rip/chroma/Hype/" id="rip.chroma.Hype" gettext-domain="hype">
     <key name="window-width" type="i">
       <default>600</default>
       <summary>Window width</summary>

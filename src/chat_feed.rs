@@ -1,15 +1,12 @@
+use crate::icon_names;
+use gtk::glib::source::timeout_add_once;
 use gtk::prelude::{AdjustmentExt, ButtonExt, GridExt, WidgetExt};
-
 use relm4::{
     binding::StringBinding,
     prelude::*,
     typed_view::list::{RelmListItem, TypedListView},
     RelmObjectExt,
 };
-
-use relm4_icons::icon_names;
-
-use glib::source::timeout_add_once;
 use std::time::Duration;
 
 pub struct ChatFeed {
