@@ -16,7 +16,6 @@ use relm4::{
 };
 
 pub(super) struct App {
-    about_dialog: Controller<AboutDialog>,
     chat_feed: Controller<ChatFeed>,
 }
 
@@ -128,17 +127,9 @@ impl SimpleComponent for App {
         root: Self::Root,
         sender: ComponentSender<Self>,
     ) -> ComponentParts<Self> {
-        let about_dialog = AboutDialog::builder()
-            .transient_for(&root)
-            .launch(())
-            .detach();
-
         let chat_feed: Controller<ChatFeed> = ChatFeed::builder().launch(()).detach();
 
-        let model = Self {
-            about_dialog,
-            chat_feed,
-        };
+        let model = Self { chat_feed };
 
         let widgets = view_output!();
 
@@ -152,9 +143,8 @@ impl SimpleComponent for App {
         };
 
         let about_action = {
-            let sender = model.about_dialog.sender().clone();
             RelmAction::<AboutAction>::new_stateless(move |_| {
-                sender.send(()).unwrap();
+                AboutDialog::builder().launch(()).detach();
             })
         };
 
