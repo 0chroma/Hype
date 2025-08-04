@@ -171,6 +171,8 @@ impl SimpleComponent for App {
 
 impl AppWidgets {
     fn save_window_size(&self) -> Result<(), glib::BoolError> {
+        //TODO: use https://crates.io/crates/gsettings-macro
+        // if this fails you need to install the schema into a `glib-2.0/schemas` subdirectory in one of the $XDG_DATA_DIRS
         let settings = gio::Settings::new(APP_ID);
         let (width, height) = self.main_window.default_size();
 
@@ -183,6 +185,7 @@ impl AppWidgets {
     }
 
     fn load_window_size(&self) {
+        //TODO: use https://crates.io/crates/gsettings-macro
         let settings = gio::Settings::new(APP_ID);
 
         let width = settings.int("window-width");

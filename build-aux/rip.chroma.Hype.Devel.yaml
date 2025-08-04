@@ -1,0 +1,41 @@
+id: rip.chroma.Hype.Devel
+runtime: org.gnome.Platform
+runtime-version: '47'
+sdk: org.gnome.Sdk
+sdk-extensions:
+- org.freedesktop.Sdk.Extension.rust-stable
+build-options:
+  append-path: /usr/lib/sdk/rust-stable/bin:/usr/lib/sdk/llvm16/bin
+  env: []
+  build-args:
+  - --share=network
+  test-args:
+  - --socket=x11
+  - --share=network
+command: hype
+finish-args:
+- --share=ipc
+- --socket=fallback-x11
+- --socket=wayland
+- --device=dri
+- --env=RUST_LOG=hype=debug
+- --env=G_MESSAGES_DEBUG=none
+- --env=RUST_BACKTRACE=1
+modules:
+- name: hype
+  sources:
+  - cargo-sources.json
+  - type: dir
+    path: ../
+  buildsystem: simple
+  build-commands:
+  - cargo fetch --offline --manifest-path Cargo.toml --verbose
+  - cargo build --offline --release --verbose
+  - install -Dm755 ./target/release/hype -t /app/bin/
+  - install -Dm644 ./data/rip.chroma.Hype.metainfo.xml -t /app/share/metainfo/
+  - install -Dm644 ./data/rip.chroma.Hype.desktop -t /app/share/applications/
+  - install -Dm644 ./data/rip.chroma.Hype.gschema.xml -t /app/share/glib-2.0/schemas/
+  - glib-compile-schemas /app/share/glib-2.0/schemas/
+  - install -Dm644 ./data/icons/${FLATPAK_ID}.svg -t /app/share/icons/hicolor/scalable/apps/
+  - cp -r target/locale /app/share/
+
