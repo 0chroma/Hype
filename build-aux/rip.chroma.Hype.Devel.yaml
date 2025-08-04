@@ -5,7 +5,7 @@ sdk: org.gnome.Sdk
 sdk-extensions:
 - org.freedesktop.Sdk.Extension.rust-stable
 build-options:
-  append-path: /usr/lib/sdk/rust-stable/bin:/usr/lib/sdk/llvm16/bin
+  append-path: /usr/lib/sdk/rust-stable/bin
   env: []
   build-args:
   - --share=network
@@ -24,12 +24,17 @@ finish-args:
 modules:
 - name: hype
   sources:
-  - cargo-sources.json
   - type: dir
     path: ../
+  - cargo-sources.json
   buildsystem: simple
+  build-options:
+    append-path: /usr/lib/sdk/rust-stable/bin
+    env:
+      CARGO_HOME: /run/build/hype/cargo
+      CARGO_NET_OFFLINE: 'true'
   build-commands:
-  - cargo fetch --offline --manifest-path Cargo.toml --verbose
+  - cargo --offline fetch --manifest-path Cargo.toml --verbose
   - cargo build --offline --release --verbose
   - install -Dm755 ./target/release/hype -t /app/bin/
   - install -Dm644 ./data/rip.chroma.Hype.metainfo.xml -t /app/share/metainfo/

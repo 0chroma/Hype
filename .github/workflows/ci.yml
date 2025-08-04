@@ -26,13 +26,13 @@ jobs:
     name: Flatpak
     runs-on: ubuntu-latest
     container:
-      image: bilelmoussaoui/flatpak-github-actions:gnome-46
+      image: bilelmoussaoui/flatpak-github-actions:gnome-47
       options: --privileged
     steps:
     - uses: actions/checkout@v4
     - uses: bilelmoussaoui/flatpak-github-actions/flatpak-builder@v6
       with:
         bundle: hype.flatpak
-        manifest-path: build-aux/rip.chroma.Hype.Devel.json
+        manifest-path: build-aux/rip.chroma.Hype.Devel.yaml
         run-tests: true
         cache-key: flatpak-builder-${{ github.sha }}

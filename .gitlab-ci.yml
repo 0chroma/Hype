@@ -3,13 +3,13 @@ stages:
   - test
 
 flatpak:
-  image: 'quay.io/gnome_infrastructure/gnome-runtime-images:gnome-46'
+  image: 'quay.io/gnome_infrastructure/gnome-runtime-images:gnome-47'
   stage: test
   tags:
     - flatpak
   variables:
     BUNDLE: "hype-nightly.flatpak"
-    MANIFEST_PATH: "build-aux/rip.chroma.Hype.Devel.json"
+    MANIFEST_PATH: "build-aux/rip.chroma.Hype.Devel.yaml"
     FLATPAK_MODULE: "hype"
     APP_ID: "rip.chroma.Hype.Devel"
     RUNTIME_REPO: "https://nightly.gnome.org/gnome-nightly.flatpakrepo"
